@@ -14,6 +14,7 @@ import {
 } from '../controllers/ratingController';
 
 import { upload } from '../middlewares/uploadConfig';
+import { verifyToken } from '../middlewares/authMiddleware';
 
 const router = Router();
 
@@ -25,23 +26,23 @@ router.get('/', getAlbums);
 router.get('/:id', getAlbumById);
 
 // POST /api/albums
-router.post('/', createAlbum);
+router.post('/', verifyToken, createAlbum);
 
 // PUT /api/albums/:id
-router.put('/:id', updateAlbum);
+router.put('/:id', verifyToken, updateAlbum);
 
 // DELETE /api/albums/:id
-router.delete('/:id', deleteAlbum);
+router.delete('/:id', verifyToken, deleteAlbum);
 
 // Rutas Ratings
 // GET /api/albums/:id/ratings
 router.get('/:id/ratings', getAlbumRatings);
 
 // POST /api/albums/:id/ratings
-router.post('/:id/ratings', createAlbumRating);
+router.post('/:id/ratings', verifyToken, createAlbumRating);
 
 // Rutas de subida de imágen
 // POST /api/albums/:id/cover
-router.post('/:id/cover', upload.single('cover'), uploadAlbumCover);
+router.post('/:id/cover', verifyToken, upload.single('cover'), uploadAlbumCover);
 
 export default router;

@@ -26,11 +26,19 @@ export const getAlbumRatings = async (req: Request, res: Response): Promise<void
 export const createAlbumRating = async (req: Request, res: Response): Promise<void> => {
     try {
         const { id } = req.params; // ID del álbum
-        const { score, review_text, user_id = 1 } = req.body; // user_id = 1 por defecto por ahora
+        const { score, review_text } = req.body;
+
+        // Extraemos el user_id del token JWT inyectado en el request
+        const user_id = (req as any).user?.id;
 
         // Validación Server-Side
         if (!score || score < 1 || score > 10) {
             res.status(400).json({ error: 'El score es obligatorio y debe estar entre 1 y 10' });
+            return;
+        }
+
+        if (!user_id) {
+            res.status(401).json({ error: 'Usuario no autenticado' });
             return;
         }
 

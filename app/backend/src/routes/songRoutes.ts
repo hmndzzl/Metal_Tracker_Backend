@@ -5,12 +5,13 @@ import {
     updateSong,
     deleteSong
 } from '../controllers/songController';
+import { verifyToken } from '../middlewares/authMiddleware';
 
 const router = Router();
 
 router.get('/', getSongs);
-router.post('/', createSong);
-router.put('/:id', updateSong);
-router.delete('/:id', deleteSong);
+router.post('/', verifyToken, createSong);
+router.put('/:id', verifyToken, updateSong);
+router.delete('/:id', verifyToken, deleteSong);
 
 export default router;
