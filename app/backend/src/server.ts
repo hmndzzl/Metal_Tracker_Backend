@@ -1,20 +1,29 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import path from 'path';
+import swaggerUi from 'swagger-ui-express';
+import YAML from 'yamljs';
+
 import pool from './config/db';
+import albumRoutes from './routes/albumRoutes';
+import bandRoutes from './routes/bandRoutes';
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware requerido por el laboratorio (CORS y parseo de JSON)
 app.use(cors({
     origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json());
+
+// Swagger
+const swaggerDocument = YAML.load(path.join(__dirname, 'docs', 'swagger.yaml'));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.get('/api/health', async (req, res) => {
     try {
@@ -29,7 +38,11 @@ app.get('/api/health', async (req, res) => {
     }
 });
 
+app.use('/api/albums', albumRoutes);
+app.use('/api/bands', bandRoutes);
+
 // Levantar el servidor
 app.listen(PORT, () => {
     console.log(`Metal Tracker API corriendo en http://localhost:${PORT}`);
+    console.log(`📖 Documentación Swagger lista en http://localhost:${PORT}/api-docs`);
 });
