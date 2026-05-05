@@ -147,3 +147,36 @@ export const deleteAlbum = async (req: Request, res: Response): Promise<void> =>
         res.status(500).json({ error: 'Internal server error' });
     }
 };
+
+// POST /albums/:id/cover 
+export const uploadAlbumCover = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { id } = req.params;
+
+        // Si Multer rechazó el archivo (por tamaño o formato) o no se envió nada
+        if (!req.file) {
+            res.status(400).json({ error: 'No se envió ninguna imagen o el archivo supera 1MB' });
+            return;
+        }
+
+        // Generamos la URL relativa que consumirá el frontend
+        const imageUrl = `/uploads/${req.file.filename}`;
+
+        // Actualizamos el álbum en la base de datos
+        const queryStr = `UPDATE albums SET cover_image_url = $1 WHERE id = $2 RETURNING *`;
+        const result = await pool.query(queryStr, [imageUrl, id]);
+
+        if (result.rows.length === 0) {
+            res.status(404).json({ error: 'Álbum no encontrado' });
+            return;
+        }
+
+        res.json({
+            message: 'Imagen subida con éxito',
+            album: result.rows[0]
+        });
+    } catch (error) {
+        console.error('Error uploading cover:', error);
+        res.status(500).json({ error: 'Internal server error al subir la imagen' });
+    }
+};

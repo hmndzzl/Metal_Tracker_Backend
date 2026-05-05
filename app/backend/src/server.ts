@@ -42,6 +42,7 @@ app.get('/api/health', async (req, res) => {
 app.use('/api/albums', albumRoutes);
 app.use('/api/bands', bandRoutes);
 app.use('/api/songs', songRoutes);
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Levantar el servidor
 app.listen(PORT, () => {

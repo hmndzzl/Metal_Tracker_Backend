@@ -4,7 +4,8 @@ import {
     getAlbumById,
     createAlbum,
     updateAlbum,
-    deleteAlbum
+    deleteAlbum,
+    uploadAlbumCover
 } from '../controllers/albumController';
 
 import {
@@ -12,9 +13,11 @@ import {
     createAlbumRating
 } from '../controllers/ratingController';
 
+import { upload } from '../middlewares/uploadConfig';
+
 const router = Router();
 
-// Rutas Albums
+// Rutas Albumes
 // GET /api/albums
 router.get('/', getAlbums);
 
@@ -36,5 +39,9 @@ router.get('/:id/ratings', getAlbumRatings);
 
 // POST /api/albums/:id/ratings
 router.post('/:id/ratings', createAlbumRating);
+
+// Rutas de subida de imágen
+// POST /api/albums/:id/cover
+router.post('/:id/cover', upload.single('cover'), uploadAlbumCover);
 
 export default router;
