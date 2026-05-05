@@ -1,0 +1,380 @@
+openapi: 3.0.0
+info:
+  title: Metal Tracker API
+  description: API REST para gestionar un catálogo de álbumes, bandas y canciones de metal.
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000/api
+    description: Servidor de Desarrollo Local
+
+tags:
+  - name: Bands
+    description: Gestión de bandas de metal
+  - name: Albums
+    description: Gestión de álbumes (Series Tracker)
+  - name: Songs
+    description: Gestión del tracklist de los álbumes
+  - name: Ratings
+    description: Sistema de calificación de álbumes
+
+paths:
+  # ==========================================
+  # BANDAS
+  # ==========================================
+  /bands:
+    get:
+      summary: Listar todas las bandas
+      tags: [Bands]
+      responses:
+        '200':
+          description: Lista de bandas obtenida con éxito.
+        '500':
+          description: Error interno del servidor.
+    post:
+      summary: Crear una nueva banda
+      tags: [Bands]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name:
+                  type: string
+                  example: "Slaughter to Prevail"
+                genre:
+                  type: string
+                  example: "Deathcore"
+                formation_year:
+                  type: integer
+                  example: 2014
+      responses:
+        '201':
+          description: Banda creada exitosamente.
+        '400':
+          description: Faltan datos obligatorios.
+        '500':
+          description: Error interno.
+
+  /bands/{id}:
+    get:
+      summary: Obtener una banda por ID
+      tags: [Bands]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Banda encontrada.
+        '404':
+          description: Banda no encontrada.
+    put:
+      summary: Actualizar una banda
+      tags: [Bands]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                genre:
+                  type: string
+                formation_year:
+                  type: integer
+      responses:
+        '200':
+          description: Banda actualizada.
+        '404':
+          description: Banda no encontrada.
+    delete:
+      summary: Eliminar una banda
+      description: Elimina la banda y, por cascada, todos sus álbumes y canciones.
+      tags: [Bands]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Banda eliminada (No Content).
+        '404':
+          description: Banda no encontrada.
+
+  # ==========================================
+  # ÁLBUMES
+  # ==========================================
+  /albums:
+    get:
+      summary: Listar todos los álbumes
+      description: Soporta paginación, búsqueda y ordenamiento.
+      tags: [Albums]
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+        - in: query
+          name: q
+          schema:
+            type: string
+        - in: query
+          name: sort
+          schema:
+            type: string
+            enum: [title, release_year, id]
+            default: release_year
+        - in: query
+          name: order
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+      responses:
+        '200':
+          description: Lista de álbumes obtenida con éxito.
+        '500':
+          description: Error interno.
+    post:
+      summary: Crear un nuevo álbum
+      tags: [Albums]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [band_id, title]
+              properties:
+                band_id:
+                  type: integer
+                  example: 1
+                title:
+                  type: string
+                  example: "Kostolom"
+                release_year:
+                  type: integer
+                  example: 2021
+                cover_image_url:
+                  type: string
+                  example: "/uploads/kostolom.jpg"
+      responses:
+        '201':
+          description: Álbum creado exitosamente.
+        '400':
+          description: Faltan datos obligatorios.
+        '500':
+          description: Error interno.
+
+  /albums/{id}:
+    get:
+      summary: Obtener un álbum por ID
+      description: Retorna los detalles del álbum y su tracklist.
+      tags: [Albums]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Detalles del álbum obtenidos.
+        '404':
+          description: Álbum no encontrado.
+    put:
+      summary: Actualizar un álbum
+      tags: [Albums]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                release_year:
+                  type: integer
+                cover_image_url:
+                  type: string
+      responses:
+        '200':
+          description: Álbum actualizado exitosamente.
+        '404':
+          description: Álbum no encontrado.
+    delete:
+      summary: Eliminar un álbum
+      tags: [Albums]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Álbum eliminado (No Content).
+        '404':
+          description: Álbum no encontrado.
+
+  # ==========================================
+  # RATINGS
+  # ==========================================
+  /albums/{id}/ratings:
+    get:
+      summary: Obtener calificaciones de un álbum
+      tags: [Ratings]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Lista de reseñas obtenida.
+        '500':
+          description: Error interno.
+    post:
+      summary: Agregar una calificación a un álbum
+      tags: [Ratings]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [score]
+              properties:
+                score:
+                  type: integer
+                  minimum: 1
+                  maximum: 10
+                  example: 9
+                review_text:
+                  type: string
+                  example: "Brutal de principio a fin."
+                user_id:
+                  type: integer
+                  example: 1
+      responses:
+        '201':
+          description: Calificación agregada.
+        '400':
+          description: Score inválido.
+
+  # ==========================================
+  # CANCIONES
+  # ==========================================
+  /songs:
+    get:
+      summary: Listar todas las canciones
+      tags: [Songs]
+      responses:
+        '200':
+          description: Lista de canciones obtenida.
+    post:
+      summary: Agregar una canción
+      tags: [Songs]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [album_id, track_number, title]
+              properties:
+                album_id:
+                  type: integer
+                  example: 1
+                track_number:
+                  type: integer
+                  example: 1
+                title:
+                  type: string
+                  example: "Bonebreaker"
+                duration_seconds:
+                  type: integer
+                  example: 265
+      responses:
+        '201':
+          description: Canción creada.
+        '400':
+          description: Datos incompletos.
+
+  /songs/{id}:
+    put:
+      summary: Editar una canción
+      tags: [Songs]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                track_number:
+                  type: integer
+                title:
+                  type: string
+                duration_seconds:
+                  type: integer
+      responses:
+        '200':
+          description: Canción actualizada.
+        '404':
+          description: Canción no encontrada.
+    delete:
+      summary: Eliminar una canción
+      tags: [Songs]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Canción eliminada (No Content).
+        '404':
+          description: Canción no encontrada.
