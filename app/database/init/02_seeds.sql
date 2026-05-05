@@ -1,7 +1,7 @@
 -- Insertar usuarios de prueba (Contraseña para todos: admin123)
 INSERT INTO users (username, password_hash, role) VALUES
-('admin', '$2b$10$wDBOZlgtMVX/H2AVdX188.bIT4AWFOwDhXNFsRtq3TwF.HiizlvYy', 'admin'),
-('hugo_metalhead', '$2b$10$wDBOZlgtMVX/H2AVdX188.bIT4AWFOwDhXNFsRtq3TwF.HiizlvYy', 'user');
+('admin', '$2a$12$934TgViAMntgo5Da0s7gS.ekX2W10k6uSseraCFuCrWluOR5gETZq', 'admin'),
+('hugo_metalhead', '$2a$12$934TgViAMntgo5Da0s7gS.ekX2W10k6uSseraCFuCrWluOR5gETZq', 'user');
 
 INSERT INTO bands (name, genre, formation_year) VALUES
 ('Slaughter to Prevail', 'Deathcore', 2014),
