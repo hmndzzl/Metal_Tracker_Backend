@@ -8,6 +8,7 @@ import YAML from 'yamljs';
 import pool from './config/db';
 import albumRoutes from './routes/albumRoutes';
 import bandRoutes from './routes/bandRoutes';
+import songRoutes from './routes/songRoutes';
 
 dotenv.config();
 
@@ -40,6 +41,7 @@ app.get('/api/health', async (req, res) => {
 
 app.use('/api/albums', albumRoutes);
 app.use('/api/bands', bandRoutes);
+app.use('/api/songs', songRoutes);
 
 // Levantar el servidor
 app.listen(PORT, () => {
