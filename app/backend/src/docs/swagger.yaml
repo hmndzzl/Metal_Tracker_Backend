@@ -7,7 +7,16 @@ servers:
   - url: http://localhost:3000/api
     description: Servidor de Desarrollo Local
 
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
 tags:
+  - name: Auth
+    description: Autenticación de usuarios
   - name: Bands
     description: Gestión de bandas de metal
   - name: Albums
@@ -18,6 +27,54 @@ tags:
     description: Sistema de calificación de álbumes
 
 paths:
+  # ==========================================
+  # AUTENTICACIÓN
+  # ==========================================
+  /auth/login:
+    post:
+      summary: Iniciar sesión
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, password]
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Login exitoso, retorna el token JWT y datos del usuario.
+        '401':
+          description: Credenciales inválidas.
+
+  /auth/register:
+    post:
+      summary: Registrar un nuevo usuario (Pruebas)
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, password]
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+                role:
+                  type: string
+                  example: admin
+      responses:
+        '201':
+          description: Usuario creado exitosamente.
+
   # ==========================================
   # BANDAS
   # ==========================================
@@ -33,6 +90,8 @@ paths:
     post:
       summary: Crear una nueva banda
       tags: [Bands]
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -55,6 +114,8 @@ paths:
           description: Banda creada exitosamente.
         '400':
           description: Faltan datos obligatorios.
+        '403':
+          description: Acceso denegado (Solo administradores).
         '500':
           description: Error interno.
 
@@ -76,6 +137,8 @@ paths:
     put:
       summary: Actualizar una banda
       tags: [Bands]
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: id
@@ -98,12 +161,16 @@ paths:
       responses:
         '200':
           description: Banda actualizada.
+        '403':
+          description: Acceso denegado (Solo administradores).
         '404':
           description: Banda no encontrada.
     delete:
       summary: Eliminar una banda
       description: Elimina la banda y, por cascada, todos sus álbumes y canciones.
       tags: [Bands]
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: id
@@ -113,6 +180,8 @@ paths:
       responses:
         '204':
           description: Banda eliminada (No Content).
+        '403':
+          description: Acceso denegado (Solo administradores).
         '404':
           description: Banda no encontrada.
 
@@ -159,6 +228,8 @@ paths:
     post:
       summary: Crear un nuevo álbum
       tags: [Albums]
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -184,6 +255,8 @@ paths:
           description: Álbum creado exitosamente.
         '400':
           description: Faltan datos obligatorios.
+        '403':
+          description: Acceso denegado (Solo administradores).
         '500':
           description: Error interno.
 
@@ -206,6 +279,8 @@ paths:
     put:
       summary: Actualizar un álbum
       tags: [Albums]
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: id
@@ -228,11 +303,15 @@ paths:
       responses:
         '200':
           description: Álbum actualizado exitosamente.
+        '403':
+          description: Acceso denegado (Solo administradores).
         '404':
           description: Álbum no encontrado.
     delete:
       summary: Eliminar un álbum
       tags: [Albums]
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: id
@@ -242,8 +321,40 @@ paths:
       responses:
         '204':
           description: Álbum eliminado (No Content).
+        '403':
+          description: Acceso denegado (Solo administradores).
         '404':
           description: Álbum no encontrado.
+
+  /albums/{id}/cover:
+    post:
+      summary: Subir la portada de un álbum
+      tags: [Albums]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                cover:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Imagen subida correctamente.
+        '400':
+          description: Archivo inválido o muy grande.
+        '403':
+          description: Acceso denegado (Solo administradores).
 
   # ==========================================
   # RATINGS
@@ -266,6 +377,8 @@ paths:
     post:
       summary: Agregar una calificación a un álbum
       tags: [Ratings]
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: id
@@ -288,14 +401,13 @@ paths:
                 review_text:
                   type: string
                   example: "Brutal de principio a fin."
-                user_id:
-                  type: integer
-                  example: 1
       responses:
         '201':
           description: Calificación agregada.
         '400':
           description: Score inválido.
+        '401':
+          description: Usuario no autenticado.
 
   # ==========================================
   # CANCIONES
@@ -310,6 +422,8 @@ paths:
     post:
       summary: Agregar una canción
       tags: [Songs]
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -335,11 +449,15 @@ paths:
           description: Canción creada.
         '400':
           description: Datos incompletos.
+        '403':
+          description: Acceso denegado (Solo administradores).
 
   /songs/{id}:
     put:
       summary: Editar una canción
       tags: [Songs]
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: id
@@ -362,11 +480,15 @@ paths:
       responses:
         '200':
           description: Canción actualizada.
+        '403':
+          description: Acceso denegado (Solo administradores).
         '404':
           description: Canción no encontrada.
     delete:
       summary: Eliminar una canción
       tags: [Songs]
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: id
@@ -376,5 +498,7 @@ paths:
       responses:
         '204':
           description: Canción eliminada (No Content).
+        '403':
+          description: Acceso denegado (Solo administradores).
         '404':
           description: Canción no encontrada.
