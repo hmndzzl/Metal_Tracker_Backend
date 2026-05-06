@@ -6,14 +6,14 @@ import {
     updateBand,
     deleteBand
 } from '../controllers/bandController';
-import { verifyToken } from '../middlewares/authMiddleware';
+import { verifyToken, isAdmin } from '../middlewares/authMiddleware';
 
 const router = Router();
 
 router.get('/', getBands);
 router.get('/:id', getBandById);
-router.post('/', verifyToken, createBand);
-router.put('/:id', verifyToken, updateBand);
-router.delete('/:id', verifyToken, deleteBand);
+router.post('/', verifyToken, isAdmin, createBand);
+router.put('/:id', verifyToken, isAdmin, updateBand);
+router.delete('/:id', verifyToken, isAdmin, deleteBand);
 
 export default router;

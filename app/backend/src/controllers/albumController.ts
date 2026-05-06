@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import pool from '../config/db';
 
-// GET /albums - Listar todos con paginación, búsqueda y ordenamiento (Challenge: 60 pts en total)
+// GET /albums - Listar todos con paginación, búsqueda y ordenamiento
 export const getAlbums = async (req: Request, res: Response): Promise<void> => {
     try {
         const { page = 1, limit = 10, q = '', sort = 'release_year', order = 'desc' } = req.query;
@@ -38,37 +38,43 @@ export const getAlbums = async (req: Request, res: Response): Promise<void> => {
     }
 };
 
-// GET /albums/:id - Obtener un álbum por ID
+// GET /albums/:id - Obtener un álbum específico y sus canciones
 export const getAlbumById = async (req: Request, res: Response): Promise<void> => {
     try {
         const { id } = req.params;
 
+        // 1. Buscar el álbum (y hacer un JOIN rápido para tener el nombre de la banda de una vez)
         const albumQuery = `
-            SELECT a.*, b.name AS band_name 
+            SELECT a.*, b.name as band_name 
             FROM albums a 
-            JOIN bands b ON a.band_id = b.id 
+            LEFT JOIN bands b ON a.band_id = b.id 
             WHERE a.id = $1
         `;
-        const result = await pool.query(albumQuery, [id]);
+        const albumResult = await pool.query(albumQuery, [id]);
 
-        if (result.rows.length === 0) {
-            res.status(404).json({ error: 'Álbum no encontrado en el abismo' });
+        if (albumResult.rows.length === 0) {
+            res.status(404).json({ error: 'Álbum no encontrado en el abismo.' });
             return;
         }
 
-        // Extra: Traemos las canciones de este álbum para que el cliente las muestre
-        const songsQuery = `SELECT id, track_number, title, duration_seconds FROM songs WHERE album_id = $1 ORDER BY track_number`;
+        const album = albumResult.rows[0];
+
+        // 2. Buscar las canciones que pertenecen a este álbum específico
+        const songsQuery = `
+            SELECT * FROM songs 
+            WHERE album_id = $1 
+            ORDER BY track_number ASC
+        `;
         const songsResult = await pool.query(songsQuery, [id]);
 
-        const albumData = {
-            ...result.rows[0],
-            tracklist: songsResult.rows
-        };
+        // 3. Adjuntar el arreglo de canciones al objeto del álbum que espera el frontend
+        album.songs = songsResult.rows;
 
-        res.json(albumData);
+        // 4. Devolver la respuesta completa
+        res.json(album);
     } catch (error) {
-        console.error('Error fetching album by id:', error);
-        res.status(500).json({ error: 'Internal server error' });
+        console.error('Error fetching album details:', error);
+        res.status(500).json({ error: 'Error interno del servidor al invocar los detalles.' });
     }
 };
 

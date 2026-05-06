@@ -19,3 +19,15 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction): vo
         res.status(401).json({ error: 'Token inválido o expirado' });
     }
 };
+
+// Middleware para verificar si el usuario es Administrador
+export const isAdmin = (req: Request, res: Response, next: NextFunction): void => {
+    // El usuario ya fue desencriptado por verifyToken y guardado en req.user
+    const user = (req as any).user;
+
+    if (user && user.role === 'admin') {
+        next(); // Tiene pase VIP, déjalo pasar a la ruta
+    } else {
+        res.status(403).json({ error: 'Acceso denegado: Solo los administradores pueden alterar el Vault.' });
+    }
+};
