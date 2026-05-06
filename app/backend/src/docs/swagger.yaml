@@ -4,7 +4,7 @@ info:
   description: API REST para gestionar un catálogo de álbumes, bandas y canciones de metal.
   version: 1.0.0
 servers:
-  - url: http://localhost:3000/api
+  - url: http://34.171.199.135:3000/api
     description: Servidor de Desarrollo Local
 
 components:
