@@ -5,8 +5,14 @@
 > **Repositorio del backend:** [https://github.com/hmndzzl/Metal_Tracker_Frontend](https://github.com/hmndzzl/Metal_Tracker_Frontend)
 >
 > **App publicada:** http://34.171.199.135:8080/
+> > **Swagger:** [http://34.171.199.135:8080/](http://34.171.199.135:3000/api-docs/#/)
 
 ---
+
+### Screenshot de app funcionando
+
+<img width="1720" height="886" alt="image" src="https://github.com/user-attachments/assets/bd310184-c4e1-4205-8a2f-45ce3166f84f" />
+
 
 API RESTful construida con Node.js, Express, TypeScript y PostgreSQL, diseñada para gestionar un catálogo de álbumes, bandas y canciones de metal. 
 
