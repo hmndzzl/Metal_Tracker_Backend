@@ -2,6 +2,10 @@
 
 ## Creado por Hugo Méndez - 241265
 
+> **Repositorio del backend:** [https://github.com/hmndzzl/Metal_Tracker_Frontend](https://github.com/hmndzzl/Metal_Tracker_Frontend)
+>
+> **App publicada:** http://34.171.199.135:8080/
+
 ---
 
 API RESTful construida con Node.js, Express, TypeScript y PostgreSQL, diseñada para gestionar un catálogo de álbumes, bandas y canciones de metal. 
