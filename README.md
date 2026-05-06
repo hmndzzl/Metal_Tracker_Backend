@@ -5,7 +5,8 @@
 > **Repositorio del backend:** [https://github.com/hmndzzl/Metal_Tracker_Frontend](https://github.com/hmndzzl/Metal_Tracker_Frontend)
 >
 > **App publicada:** http://34.171.199.135:8080/
-> > **Swagger:** [http://34.171.199.135:8080/](http://34.171.199.135:3000/api-docs/#/)
+> 
+> **Swagger:** [http://34.171.199.135:8080/](http://34.171.199.135:3000/api-docs/#/)
 
 ---
 
