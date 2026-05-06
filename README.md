@@ -14,6 +14,7 @@
 
 <img width="1720" height="886" alt="image" src="https://github.com/user-attachments/assets/bd310184-c4e1-4205-8a2f-45ce3166f84f" />
 
+---
 
 API RESTful construida con Node.js, Express, TypeScript y PostgreSQL, diseñada para gestionar un catálogo de álbumes, bandas y canciones de metal. 
 
